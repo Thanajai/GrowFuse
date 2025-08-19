@@ -65,7 +65,7 @@ export const getAgroRecommendations = async (
   forecastDuration: ForecastDuration
 ): Promise<CropRecommendation[]> => {
   // Check for the API key inside the function to provide a user-friendly error at runtime.
-  if (!ai) {
+  if (!ai || !API_KEY) {
     throw new Error("The recommendation service is currently unavailable due to a configuration issue. Please contact support.");
   }
   
