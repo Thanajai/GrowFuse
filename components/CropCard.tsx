@@ -18,6 +18,11 @@ const CropCard: React.FC<CropCardProps> = ({ crop, language, index, onClick }) =
       ? 'bg-green-500 text-white'
       : 'bg-amber-500 text-brand-dark font-semibold';
 
+  const handleImageError = () => {
+    console.error(`Failed to load image for ${crop.englishCropName} from URL: ${crop.imageUrl}`);
+    setImageError(true);
+  };
+
   return (
     <button
       onClick={onClick}
@@ -31,7 +36,7 @@ const CropCard: React.FC<CropCardProps> = ({ crop, language, index, onClick }) =
           src={crop.imageUrl} 
           alt={crop.cropName} 
           className="w-full h-full object-cover transition-transform duration-500 ease-in-out group-hover:scale-105"
-          onError={() => setImageError(true)}
+          onError={handleImageError}
         />
       ) : (
         <div className="w-full h-full bg-gradient-to-br from-brand-dark-tertiary to-brand-dark-secondary">
