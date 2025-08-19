@@ -51,6 +51,12 @@ const App: React.FC = () => {
     e.preventDefault();
     if (!location || !soilType || !landArea) return;
 
+    // Pre-flight check for the API key to provide a clear error message in the UI.
+    if (!process.env.API_KEY) {
+      setError(UI_TEXT[language].apiKeyMissingError);
+      return;
+    }
+
     setIsLoading(true);
     setError(null);
     setResults([]);
