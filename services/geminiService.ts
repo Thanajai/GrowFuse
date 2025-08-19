@@ -111,7 +111,7 @@ export const getAgroRecommendations = async (
     const recommendationsWithImages = await Promise.all(
       recommendationsFromApi.map(async (rec: any) => {
         try {
-          const imagePrompt = `A high-quality, vibrant photograph of a healthy ${rec.englishCropName} crop growing in a sun-drenched field. Focus on the crop itself. Photorealistic, agricultural photography, clear blue sky.`;
+          const imagePrompt = `High-quality, photorealistic shot of a thriving, healthy ${rec.englishCropName} crop in a field under a clear sunny sky. Focus on the plants. Agricultural photography. No text, no watermarks.`;
 
           const imageResponse = await ai.models.generateImages({
               model: 'imagen-3.0-generate-002',
@@ -119,7 +119,7 @@ export const getAgroRecommendations = async (
               config: {
                   numberOfImages: 1,
                   outputMimeType: 'image/jpeg',
-                  aspectRatio: '16:9',
+                  aspectRatio: '4:3',
               },
           });
           
@@ -140,7 +140,7 @@ export const getAgroRecommendations = async (
             .toLowerCase();
           return {
             ...rec,
-            imageUrl: `https://source.unsplash.com/400x250/?${sanitizedName},crop,field,farm`
+            imageUrl: `https://source.unsplash.com/800x600/?${sanitizedName}-crop,farm-field`
           };
         }
       })
