@@ -31,13 +31,30 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onUpdateUser, language }) =
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [newFarmName, setNewFarmName] = useState('');
   const [newFarmLocation, setNewFarmLocation] = useState('');
+  const [newFarmLocationError, setNewFarmLocationError] = useState<string | null>(null);
   const [newFarmSoilType, setNewFarmSoilType] = useState<SoilType | ''>('');
   const [newFarmLandArea, setNewFarmLandArea] = useState('');
   const [selectedCrop, setSelectedCrop] = useState<CropRecommendation | null>(null);
 
+  const handleFarmLocationChange = (value: string) => {
+    if (/^\d*$/.test(value)) {
+        setNewFarmLocation(value);
+        if (newFarmLocationError) {
+            setNewFarmLocationError(null);
+        }
+    }
+  };
+
   const handleAddFarm = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newFarmName || !newFarmLocation || !newFarmSoilType || !newFarmLandArea) return;
+
+    if (!/^\d{6}$/.test(newFarmLocation)) {
+        setNewFarmLocationError(UI_TEXT[language].invalidPincode);
+        return;
+    }
+    setNewFarmLocationError(null);
+
+    if (!newFarmName || !newFarmSoilType || !newFarmLandArea) return;
 
     const newFarm: Farm = {
       id: `farm_${new Date().getTime()}`,
@@ -178,13 +195,15 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onUpdateUser, language }) =
             <label htmlFor="farmLocation" className="block text-sm font-medium text-gray-700 dark:text-gray-300">{UI_TEXT[language].locationLabel}</label>
             <input
               id="farmLocation"
-              type="text"
+              type="tel"
               value={newFarmLocation}
-              onChange={e => setNewFarmLocation(e.target.value)}
+              onChange={e => handleFarmLocationChange(e.target.value)}
               placeholder={UI_TEXT[language].locationPlaceholder}
               required
-              className="mt-1 w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-glow-green focus:border-brand-green transition-shadow duration-300"
+              maxLength={6}
+              className={`mt-1 w-full px-4 py-2 border rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:ring-2 focus:ring-glow-green focus:border-brand-green transition-shadow duration-300 ${newFarmLocationError ? 'border-red-500' : 'border-gray-300 dark:border-gray-600'}`}
             />
+             {newFarmLocationError && <p className="text-sm text-red-600 dark:text-red-400 mt-1">{newFarmLocationError}</p>}
           </div>
            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                <div>

@@ -24,6 +24,17 @@ export enum ForecastDuration {
   TWELVE_MONTHS = '12',
 }
 
+export enum CropType {
+  ANY = 'Any',
+  GRAIN = 'Grain',
+  VEGETABLE = 'Vegetable',
+  FRUIT = 'Fruit',
+  PULSE = 'Pulse',
+  OILSEED = 'Oilseed',
+  FIBER = 'Fiber',
+  SPICE = 'Spice',
+}
+
 export interface CropRecommendation {
   cropName: string;
   englishCropName: string;
@@ -41,6 +52,7 @@ export interface HistoryEntry {
     soilType: SoilType;
     landArea: number;
     forecastDuration: ForecastDuration;
+    cropType: CropType;
   };
   recommendations: CropRecommendation[];
 }

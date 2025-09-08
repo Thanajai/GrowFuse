@@ -1,8 +1,8 @@
 
 import React, { useState } from 'react';
 import type { HistoryEntry, CropRecommendation } from '../types';
-import { Language } from '../types';
-import { UI_TEXT, SOIL_TYPE_TRANSLATIONS } from '../constants';
+import { Language, CropType } from '../types';
+import { UI_TEXT, SOIL_TYPE_TRANSLATIONS, CROP_TYPE_TRANSLATIONS } from '../constants';
 import CropCard from './CropCard';
 import ExpandedCropCard from './ExpandedCropCard';
 import { ArrowLeftIcon } from './IconComponents';
@@ -70,6 +70,7 @@ const HistoryView: React.FC<HistoryViewProps> = ({ history, language }) => {
                     <h4 className="font-semibold text-lg text-gray-800 dark:text-brand-light mb-2">{UI_TEXT[language].inputs}</h4>
                     <p className="text-sm text-gray-600 dark:text-gray-300">
                         {selectedEntry.inputs.location} | {SOIL_TYPE_TRANSLATIONS[selectedEntry.inputs.soilType][language]} | {selectedEntry.inputs.landArea} acres | {selectedEntry.inputs.forecastDuration} Month Forecast
+                        {selectedEntry.inputs.cropType && selectedEntry.inputs.cropType !== CropType.ANY && ` | Type: ${CROP_TYPE_TRANSLATIONS[selectedEntry.inputs.cropType][language]}`}
                     </p>
                 </div>
 

@@ -159,16 +159,22 @@ export const GrowFuseLogo = ({ className }: { className?: string }) => (
     viewBox="0 0 200 30"
     xmlns="http://www.w3.org/2000/svg"
   >
+    <defs>
+      <linearGradient id="logoGradient" x1="0%" y1="0%" x2="100%" y2="0%">
+        <stop offset="0%" style={{ stopColor: '#10B981', stopOpacity: 1 }} />
+        <stop offset="100%" style={{ stopColor: '#06B6D4', stopOpacity: 1 }} />
+      </linearGradient>
+    </defs>
     <text
       x="50%"
       y="50%"
       dominantBaseline="middle"
       textAnchor="middle"
-      fontFamily="sans-serif"
+      fontFamily="Poppins, sans-serif"
       fontSize="24"
       fontWeight="600"
       letterSpacing="1"
-      fill="currentColor"
+      fill="url(#logoGradient)"
     >
       GrowFuse
     </text>

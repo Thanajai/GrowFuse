@@ -7,18 +7,21 @@ import HistoryView from './components/HistoryView';
 import { getAgroRecommendations } from './services/geminiService';
 import * as historyService from './services/historyService';
 import type { CropRecommendation, SoilType, HistoryEntry } from './types';
-import { Language, ForecastDuration } from './types';
+import { Language, ForecastDuration, CropType } from './types';
 import { UI_TEXT } from './constants';
 import { LeftIllustration, RightIllustration } from './components/IconComponents';
+import ParticleBackground from './components/ParticleBackground';
 
 const App: React.FC = () => {
   const [theme, setTheme] = useState<'light' | 'dark'>('dark');
   const [language, setLanguage] = useState<Language>(Language.ENGLISH);
   
   const [location, setLocation] = useState('');
+  const [locationError, setLocationError] = useState<string | null>(null);
   const [soilType, setSoilType] = useState<SoilType | ''>('');
   const [landArea, setLandArea] = useState('');
   const [forecastDuration, setForecastDuration] = useState<ForecastDuration>(ForecastDuration.SIX_MONTHS);
+  const [cropType, setCropType] = useState<CropType>(CropType.ANY);
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -47,9 +50,27 @@ const App: React.FC = () => {
     setTheme(theme === 'light' ? 'dark' : 'light');
   };
   
+  const handleLocationChange = (value: string) => {
+    // Only allow digits to be entered
+    if (/^\d*$/.test(value)) {
+        setLocation(value);
+        if (locationError) {
+            setLocationError(null);
+        }
+    }
+  };
+
   const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!location || !soilType || !landArea) return;
+    
+    // Validate pincode before proceeding
+    if (!/^\d{6}$/.test(location)) {
+      setLocationError(UI_TEXT[language].invalidPincode);
+      return;
+    }
+    setLocationError(null); // Clear error on successful validation
+
+    if (!soilType || !landArea) return;
 
     // Pre-flight check for the API key to provide a clear error message in the UI.
     if (!process.env.API_KEY) {
@@ -63,7 +84,7 @@ const App: React.FC = () => {
 
     try {
       const area = parseFloat(landArea);
-      const recommendations = await getAgroRecommendations(location, soilType, area, language, forecastDuration);
+      const recommendations = await getAgroRecommendations(location, soilType, area, language, forecastDuration, cropType);
       setResults(recommendations);
 
       if (recommendations.length > 0) {
@@ -76,7 +97,8 @@ const App: React.FC = () => {
                 location,
                 soilType: soilType as SoilType,
                 landArea: parseFloat(landArea),
-                forecastDuration
+                forecastDuration,
+                cropType,
             },
             recommendations: recommendations,
         };
@@ -99,11 +121,11 @@ const App: React.FC = () => {
     } finally {
       setIsLoading(false);
     }
-  }, [location, soilType, landArea, language, forecastDuration]);
+  }, [location, soilType, landArea, language, forecastDuration, cropType]);
 
   const renderRecommenderView = () => (
     <>
-      <section className="relative overflow-hidden bg-gradient-to-br from-green-400 to-teal-500 text-white rounded-xl shadow-2xl mb-12 py-16 px-8 text-center opacity-0 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
+      <section className="relative overflow-hidden bg-gradient-to-br from-emerald-500 to-cyan-500 text-white rounded-xl shadow-2xl mb-12 py-16 px-8 text-center opacity-0 animate-fadeInUp" style={{ animationDelay: '100ms' }}>
         <div className="absolute inset-0 bg-field-pattern bg-repeat-x bg-bottom opacity-50"></div>
         <h1 className="text-4xl md:text-5xl font-light tracking-tight relative z-10">
            {UI_TEXT[language].subtitle}
@@ -113,7 +135,8 @@ const App: React.FC = () => {
       <section className="mb-12 opacity-0 animate-fadeInUp" style={{ animationDelay: '300ms' }}>
         <InputForm
           location={location}
-          setLocation={setLocation}
+          setLocation={handleLocationChange}
+          locationError={locationError}
           soilType={soilType}
           setSoilType={setSoilType}
           landArea={landArea}
@@ -123,6 +146,8 @@ const App: React.FC = () => {
           language={language}
           forecastDuration={forecastDuration}
           setForecastDuration={setForecastDuration}
+          cropType={cropType}
+          setCropType={setCropType}
         />
       </section>
 
@@ -139,8 +164,30 @@ const App: React.FC = () => {
 
   return (
     <div className="min-h-screen font-sans relative overflow-x-hidden">
-        <LeftIllustration className="fixed top-1/3 -left-24 w-[30rem] h-auto text-gray-400/20 dark:text-gray-500/10 hidden xl:block -z-0" />
-        <RightIllustration className="fixed top-1/3 -right-24 w-[30rem] h-auto text-gray-400/20 dark:text-gray-500/10 hidden xl:block -z-0" />
+        {/* Background Effects */}
+        <ParticleBackground theme={theme} />
+        
+        {/* Background Texture & Color */}
+        <div className="absolute top-0 left-0 w-full h-full bg-brand-light dark:bg-brand-dark-secondary bg-[radial-gradient(theme(colors.gray.200)_0.5px,transparent_0.5px)] dark:bg-[radial-gradient(theme(colors.gray.700)_0.5px,transparent_0.5px)] [background-size:16px_16px] -z-40" />
+        
+        {/* Animated Blobs */}
+        <div className="absolute top-0 left-0 w-full h-full overflow-hidden -z-30">
+            <div 
+                className="absolute -top-1/4 left-0 w-72 h-72 lg:w-96 lg:h-96 bg-emerald-200 dark:bg-emerald-900/50 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-40 animate-blob"
+                style={{ animationDuration: '15s' }}
+            ></div>
+            <div 
+                className="absolute top-1/4 -right-1/4 w-72 h-72 lg:w-96 lg:h-96 bg-cyan-200 dark:bg-cyan-900/50 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-40 animate-blob"
+                style={{ animationDelay: '3s', animationDuration: '20s' }}
+            ></div>
+            <div 
+                className="absolute bottom-0 left-1/3 w-72 h-72 lg:w-96 lg:h-96 bg-green-200 dark:bg-green-900/50 rounded-full mix-blend-multiply dark:mix-blend-lighten filter blur-3xl opacity-40 animate-blob"
+                style={{ animationDelay: '6s', animationDuration: '25s' }}
+            ></div>
+        </div>
+
+        <LeftIllustration className="fixed top-1/3 -left-24 w-[30rem] h-auto text-gray-400/20 dark:text-gray-500/10 hidden xl:block -z-20" />
+        <RightIllustration className="fixed top-1/3 -right-24 w-[30rem] h-auto text-gray-400/20 dark:text-gray-500/10 hidden xl:block -z-20" />
 
       <Header
         theme={theme}
